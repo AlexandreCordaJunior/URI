@@ -3,62 +3,49 @@
 using namespace std;
 
 typedef pair<int, int> ii;
+typedef pair<int, ii> iii;
 
-int max(int a, int b){
-	return a > b ? a : b;
-}
-
-int **dp;
-int **pai;
-
-void init(int qtd, int valor){
-	pai = (int **) malloc(sizeof(int *) * (qtd + 1));
-	dp = (int **) malloc(sizeof(int *) * (qtd + 1));
-	for(int i = 0; i <= qtd; i++){
-		dp[i] = (int *) malloc(sizeof(int) * (valor + 1));
-		pai[i] = (int *) malloc(sizeof(int) * (valor + 1));
+iii knapSack(int total, int peso, ii *vet, int pesoPego, int naoPegos){
+	if(total == 0 or peso == 0){
+		return {0, {pesoPego, naoPegos}};
 	}
-	for(int i = 0; i <= qtd; i++){
-		for(int j = 0; j <= valor; j++){
-			dp[i][j] = 0;
-			pai[i][j] = 0;
-		}
+	if(vet[total - 1].second > peso){
+		return knapSack(total - 1, peso, vet, pesoPego, naoPegos + 1);
 	}
-}
+	iii v1 = knapSack(total - 1, peso, vet, pesoPego, naoPegos + 1);
+	v1.second.second += 1;
+	iii v2 = knapSack(total - 1, peso - vet[total - 1].second, vet, pesoPego, naoPegos);
+	v2.first += vet[total - 1].first;
+	v2.second.first += vet[total - 1].second;
 
-int knapSack(ii *vet, int qtd, int total){
-	if(total == 0 or qtd == 0){
-		return 0;
-	}
-	if(dp[qtd][total] != 0) return dp[qtd][total];
-	if(vet[qtd - 1].second > total) return knapSack(vet, qtd - 1, total);
-	int maximo = knapSack(vet, qtd - 1, total);
-	int temp = knapSack(vet, qtd - 1, total - vet[qtd - 1].second) + vet[qtd - 1].first;
-	if(temp > maximo){
-		maximo = temp;
-		pai[qtd - 1][total - vet[qtd - 1].second] = total;
+	if(v1.first > v2.first){
+		return v1;
 	}
 	else{
-		pai[qtd - 1][total] = total;
+		return v2;
 	}
-	dp[qtd][total] = maximo;
-	return maximo;
 }
 
 int main()
 {
 	int casos;
 	scanf("%d", &casos);
+
 	while(casos--){
-		int qtd;
-		scanf("%d", &qtd);
-		ii *vet = new ii[qtd];
-		for(int i = 0; i < qtd; i++){
+		int total;
+		scanf("%d", &total);
+
+		ii *vet = new ii[total];
+		int totalPack = 0;
+		for(int i = 0; i < total; i++){
 			int qtd, peso;
 			scanf("%d %d", &qtd, &peso);
+			totalPack += qtd;
 			vet[i] = {qtd, peso};
 		}
-		init(qtd, 50);
-		int brinquedos = knapSack(vet, qtd, 50);
+
+		iii res = knapSack(total, 50, vet, 0, 0);
+		printf("%d brinquedos\nPeso: %d kg\nsobra(m) %d pacote(s)\n\n",
+			res.first, res.second.first, res.second.second);
 	}
 }

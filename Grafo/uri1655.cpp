@@ -1,69 +1,61 @@
 #include <bits/stdc++.h>
 
-#define BIG 10000;
+#define db(x) cout << x << endl
 
 using namespace std;
+
+typedef vector<pair<double, int>> vd;
 
 
 struct Graph{
 	int v;
-	double **matrix;
+	vector<vd> e;
+
 	Graph(int v){
 		this->v = v;
-		matrix = (double **) malloc(sizeof(double *) * v);
-		for(int i = 0; i < v; i++){
-			matrix[i] = (double *) malloc(sizeof(double) * v);
-		}
-		for(int i = 0; i < v; i++){
-			for(int j = 0; j < v; j++){
-				matrix[i][j] = 0;
-			}
-		}
+		e.assign(v, vd());
 	}
 
-	void floyd(){
-		for(int k = 0; k < v; k++){
-			for(int i = 0; i < v; i++){
-				for(int j = 0; j < v; j++){
-					if(matrix[i][j] < matrix[i][k] * matrix[k][j]){
-						matrix[i][j] = matrix[i][k] * matrix[k][j];
-					}
+	void addEdge(int u, int v, double w){
+		e[u].push_back({w, v});
+		e[v].push_back({w, u});
+	}
+
+	double dijkstra(int start, int finish){
+		vector<double> d(v, -1);
+		d[start] = 1.0;
+		priority_queue<pair<double, int>, vd, greater<pair<double, int>>> pq;
+		pq.push({1.0, start});
+
+		while(!pq.empty()){
+			pair<double, int> u = pq.top(); pq.pop();
+
+			for(auto i: e[u.second]){
+				if(d[i.second] < d[u.second] * i.first){
+					d[i.second] = d[u.second] * i.first;
+					pq.push({d[i.second], i.second});
 				}
 			}
 		}
+		return d[finish];
 	}
 };
 
 int main()
 {
+	int n, m;
 	while(1){
-		int v, e;
-		scanf("%d", &v);
-		if(v == 0) break;
-		scanf("%d", &e);
-		Graph g(v);
-		while(e--){
-			int u, v;
-			double w;
-			scanf("%d %d %lf", &u, &v, &w);
-			w = w / 100.0;
-			g.matrix[u - 1][v - 1] = g.matrix[v - 1][u - 1] = w;
+		scanf("%d", &n);
+		if(n == 0) break;
+		scanf("%d", &m);
+
+		Graph g(n);
+		for(int i = 0; i < m; i++){
+			int u, v, w;
+			scanf("%d %d %d", &u, &v, &w);
+			g.addEdge(u - 1, v - 1, w / 100.0);
 		}
-		/*for(int i = 0; i < v; i++){
-			for(int j = 0; j < v; j++){
-				printf("%.2lf ", g.matrix[i][j]);
-			}
-			printf("\n");
-		}
-		printf("\n\n");*/
-		g.floyd();
-		/*
-		for(int i = 0; i < v; i++){
-			for(int j = 0; j < v; j++){
-				printf("%.6lf ", g.matrix[i][j]);
-			}
-			printf("\n");
-		}*/
-		printf("%.6lf percent\n", g.matrix[0][v]);
+
+		printf("%.6lf percent\n", g.dijkstra(0, n - 1) * 100);
 	}
 }

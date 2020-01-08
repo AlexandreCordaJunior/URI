@@ -6,30 +6,36 @@ int main()
 {
 	int x, y;
 	scanf("%d %d", &x, &y);
-	string mapa[x];
+	getchar();
+	string *vet = new string[x];
 	for(int i = 0; i < x; i++){
-		getchar();
-		getline(cin, mapa[i]);
+		getline(cin, vet[i]);
 	}
 	int cont = 0;
 	for(int i = 0; i < x; i++){
 		for(int j = 0; j < y; j++){
-			if(mapa[i][j] == '#'){
-				if(i - 1 >= 0 && mapa[i - 1][j] == '.'){
+			if(vet[i][j] == '#'){
+				if(i == 0 || j == 0 || i == x - 1 || j == y - 1){
 					cont++;
-					continue;
+					vet[i][j] = 'C';
 				}
-				if(i + 1 < x && mapa[i + 1][j] == '.'){
-					cont++;
-					continue;
-				}
-				if(j - 1 >= 0 && mapa[i][j - 1] == '.'){
-					cont++;
-					continue;
-				}
-				if(j + 1 < y && mapa[i][j + 1] == '.'){
-					cont++;
-					continue;
+				else{
+					if(i > 0 && vet[i - 1][j] == '.'){
+						cont++;
+						vet[i][j] = 'C';
+					}
+					else if(j > 0 && vet[i][j - 1] == '.'){
+						cont++;
+						vet[i][j] = 'C';	
+					}
+					else if(i < x - 1 && vet[i + 1][j] == '.'){
+						cont++;
+						vet[i][j] = 'C';
+					}
+					else if(j < y - 1 && vet[i][j + 1] == '.'){
+						cont++;
+						vet[i][j] = 'C';
+					}
 				}
 			}
 		}
