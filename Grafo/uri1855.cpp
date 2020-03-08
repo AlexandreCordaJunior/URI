@@ -1,92 +1,89 @@
 #include <bits/stdc++.h>
+#define db(x) cout << x << endl
 
 using namespace std;
 
-int main()
-{
+int main(){
     int x, y;
-    scanf("%d %d", &x, &y);
-    string matrix[y];
-    for(int i = 0; i < y; i++){
+    scanf("%d\n%d", &y, &x);
+    char mat[101][101];
+    int visited[101][101];
+    for(int i = 0; i < x; i++){
         getchar();
-        string temp;
-        getline(cin, temp);
-
-        matrix[i] = temp;
-    }
-    int cont = 0;
-    for(int i = 0; i < y; i++){
-        for(int j = 0; j < x; j++){
-            if(matrix[i][j] == '*') cont = 1;
+        for(int j = 0; j < y; j++){
+            scanf("%c", &mat[i][j]);
+            visited[i][j] = 0;
         }
     }
-    if(!cont){
-        printf("!\n");
-    }
-    else{
-        bool gratis = true;
-        int i = 0;
-        int j = 0;
-        while(1){
-            if((!gratis) && (i == 0) && (j == 0)){
-                printf("!\n");
-                break;
-            }
-            gratis = false;
-            if(i < 0 or i >= y or j < 0 or j >= x){
-                break;
-            }
-            if(matrix[i][j] == '*'){
-                printf("*\n");
-                break;
-            }
-            switch(matrix[i][j]){
-                case '>':
-                    j++;
-                    while(j < x && matrix[i][j] == '.'){
-                        //printf("%d %d\n", i, j);
-                        j++;
+    
+    stack<pair<int, int>> s;
+    visited[0][0] = 1;
+    s.push({0, 0});
+    bool bau = false;
 
-                    }
-                    if(j >= x){
-                        printf("!\n");
-                        break;
-                    }
+    while(!s.empty()){
+        pair<int, int> u = s.top(); s.pop();
+
+        if(mat[u.first][u.second] == '>'){
+            for(int j = u.second; j < y; j++){
+                if(mat[u.first][j] == '*'){
+                    bau = true;
                     break;
-                case '<':
-                    j--;
-                    while(j >= 0 && matrix[i][j] == '.'){
-                        //printf("%d %d\n", i, j);
-                        j--;
+                }
+                if(mat[u.first][j] == '>' or mat[u.first][j] == '^' or
+                    mat[u.first][j] == '<' or mat[u.first][j] == 'v'){
+                    if(visited[u.first][j] == 0){
+                        s.push({u.first, j});
                     }
-                    if(j < 0){
-                        printf("!\n");
-                        break;
-                    }
+                }
+                visited[u.first][j] = 1;
+            }
+        }
+        else if(mat[u.first][u.second] == 'v'){
+            for(int i = u.first; i < x; i++){
+                if(mat[i][u.second] == '*'){
+                    bau = true;
                     break;
-                case '^':
-                    i--;
-                    while(i >= 0 && matrix[i][j] == '.'){
-                        //printf("%d %d\n", i, j);
-                        i--;
+                }
+                if(mat[i][u.second] == '>' or mat[i][u.second] == '^' or
+                    mat[i][u.second] == '<' or mat[i][u.second] == 'v'){
+                    if(visited[i][u.second] == 0){
+                        s.push({i, u.second});
                     }
-                    if(i < 0){
-                        printf("!\n");
-                        break;
-                    }
+                }
+                visited[i][u.second] = 1;
+            }
+        }
+        else if(mat[u.first][u.second] == '<'){
+            for(int j = u.second - 1; j >= 0; j--){
+                if(mat[u.first][j] == '*'){
+                    bau = true;
                     break;
-                case 'v':
-                    i++;
-                    while(i < y && matrix[i][j] == '.'){
-                        //printf("%d %d\n", i, j);
-                        i++;
+                }
+                if(mat[u.first][j] == '>' or mat[u.first][j] == '^' or
+                    mat[u.first][j] == '<' or mat[u.first][j] == 'v'){
+                    if(visited[u.first][j] == 0){
+                        s.push({u.first, j});
                     }
-                    if(i >= y){
-                        printf("!\n");
-                        break;
-                    }
+                }
+                visited[u.first][j] = 1;
+            }
+        }
+        else if(mat[u.first][u.second] == '^'){
+            for(int i = u.first - 1; i >= 0; i--){
+                if(mat[i][u.second] == '*'){
+                    bau = true;
                     break;
+                }
+                if(mat[i][u.second] == '>' or mat[i][u.second] == '^' or
+                    mat[i][u.second] == '<' or mat[i][u.second] == 'v'){
+                    if(visited[i][u.second] == 0){
+                        s.push({i, u.second});
+                    }
+                }
+                visited[i][u.second] = 1;
             }
         }
     }
+    printf("%c\n", bau ? '*' : '!');
 }
